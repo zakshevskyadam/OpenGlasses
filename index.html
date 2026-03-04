@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>OpenGlasses Authorization</title>
+<script>
+// Meta auth redirects here with tokens in the URL.
+// Without Associated Domains, iOS opens Safari instead of the app.
+// This page redirects to the app via custom URL scheme.
+(function() {
+  var search = window.location.search || '';
+  var hash = window.location.hash || '';
+  var appScheme = 'mwdat-688603774243722://' + window.location.pathname;
+  if (search) appScheme += search;
+  if (hash) appScheme += hash;
+  
+  // Try to open the app
+  window.location.replace(appScheme);
+  
+  // Fallback message if redirect fails
+  setTimeout(function() {
+    document.getElementById('status').textContent = 
+      'If OpenGlasses did not open, make sure the app is installed and try again.';
+    document.getElementById('manual').style.display = 'block';
+    document.getElementById('manual-link').href = appScheme;
+  }, 2000);
+})();
+</script>
+</head>
+<body style="font-family: -apple-system, sans-serif; text-align: center; padding: 60px 20px;">
+  <h2>Redirecting to OpenGlasses...</h2>
+  <p id="status">Opening the app...</p>
+  <div id="manual" style="display:none; margin-top: 20px;">
+    <a id="manual-link" href="#" style="display:inline-block; padding: 12px 24px; background: #007AFF; color: white; border-radius: 8px; text-decoration: none;">Open OpenGlasses</a>
+  </div>
+</body>
+</html>
