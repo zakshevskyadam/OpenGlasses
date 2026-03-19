@@ -128,7 +128,15 @@ class LLMService: ObservableObject {
     // MARK: - Anthropic Claude
 
     private func sendAnthropic(_ text: String, systemPrompt: String, config: ModelConfig, includeTools: Bool, imageData: Data?) async throws -> String {
-        let apiKey = config.apiKey
+        // If using OAuth token, auto-refresh if expired
+        let apiKey: String
+        let isOAuth = config.apiKey.hasPrefix("sk-ant-oat")
+        let oauthConfigured = await OAuthTokenManager.shared.isConfigured
+        if isOAuth || oauthConfigured {
+            apiKey = try await OAuthTokenManager.shared.getValidAccessToken()
+        } else {
+            apiKey = config.apiKey
+        }
         guard !apiKey.isEmpty else {
             throw LLMError.missingAPIKey("Anthropic API key not configured")
         }
@@ -160,7 +168,12 @@ class LLMService: ObservableObject {
             var request = URLRequest(url: URL(string: "https://api.anthropic.com/v1/messages")!)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+            // Support both API keys (sk-ant-api...) and OAuth tokens (sk-ant-oat...) from Max/Pro subscriptions
+            if apiKey.hasPrefix("sk-ant-oat") {
+                request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            } else {
+                request.setValue(apiKey, forHTTPHeaderField: "x-api-key")
+            }
             request.setValue("2023-06-01", forHTTPHeaderField: "anthropic-version")
 
             var body: [String: Any] = [

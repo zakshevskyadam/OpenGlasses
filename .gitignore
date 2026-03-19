@@ -33,3 +33,6 @@ Carthage/Build/
 
 # Claude settings
 .claude/
+
+# Don't commit OAuth tokens
+# Tokens are in OpenGlassesApp.swift init()

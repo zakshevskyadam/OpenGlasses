@@ -292,6 +292,25 @@ struct Config {
         UserDefaults.standard.removeObject(forKey: "customSystemPrompt")
     }
 
+    // MARK: - OAuth Token Management (Claude Max/Pro)
+
+    /// Set up OAuth tokens for Claude Max/Pro subscription
+    static func setupOAuthTokens(accessToken: String, refreshToken: String, expiresAt: Double) {
+        Task {
+            await OAuthTokenManager.shared.saveTokens(
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+                expiresAt: expiresAt
+            )
+        }
+    }
+
+    /// Whether OAuth is configured
+    static var isOAuthConfigured: Bool {
+        let rt = UserDefaults.standard.string(forKey: "oauthRefreshToken") ?? ""
+        return !rt.isEmpty
+    }
+
     // MARK: - ElevenLabs TTS
 
     /// ElevenLabs API key for natural TTS voices
