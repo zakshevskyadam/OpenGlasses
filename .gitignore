@@ -35,4 +35,6 @@ Carthage/Build/
 .claude/
 
 # Don't commit OAuth tokens
-# Tokens are in OpenGlassesApp.swift init()
+oauth_tokens.secret
+*.secret
+**/Secrets.swift

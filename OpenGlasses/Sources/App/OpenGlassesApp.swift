@@ -82,6 +82,15 @@ struct OpenGlassesApp: App {
 
     init() {
         configureWearables()
+        // Seed OAuth tokens on first launch for Claude Max subscription
+        if !Config.isOAuthConfigured {
+            Config.setupOAuthTokens(
+                accessToken: Secrets.oauthAccessToken,
+                refreshToken: Secrets.oauthRefreshToken,
+                expiresAt: Secrets.oauthExpiresAt
+            )
+            Config.setAnthropicAPIKey("sk-ant-oat01-oauth-max")
+        }
     }
 
     var body: some Scene {
